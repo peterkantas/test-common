@@ -10,14 +10,21 @@ import static reading.json.ReadJsonNode.readJsonValaszNode;
 
 
 public class JsonAssert {
-    public static void jsonAssert(String url, String parent, String child, int childID, String keyValue, String expected) throws IOException {
+    public static void jsonAssertWithUrl(String url, String parent, String child, int childID, String keyValue, String expected) throws IOException {
         JsonNode jsonNode = readJsonValaszNode(url);
-        String actual = null;
         if (expected == null) {
             expected = "null";
         }
-        try {
+        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
+    }
 
+    public static void jsonAssertWithFile(JsonNode jsonNode, String parent, String child, int childID, String keyValue, String expected) {
+        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
+    }
+
+    public static void jsonAssertion(JsonNode jsonNode, String parent, String child, int childID, String keyValue, String expected) {
+        String actual = null;
+        try {
             if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
                 actual = jsonNode.get(parent).get(0).get(child).get(childID).get(keyValue).asText();
                 assertEquals(expected, actual);
@@ -32,10 +39,10 @@ public class JsonAssert {
             }
         } catch (AssertionError aE) {
             if (keyValue.equals("")) {
-                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + child +"  Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " +actual);
+                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + child + "  Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " + actual);
                 throw aE;
             } else {
-                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + keyValue + "   Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " +actual);
+                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + keyValue + "   Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " + actual);
             }
         }
     }
