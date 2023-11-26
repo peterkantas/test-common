@@ -10,7 +10,7 @@ import static reading.json.ReadJsonNode.readJsonValaszNode;
 
 
 public class JsonAssert {
-    public static void jsonAssertWithUrl(String url, String parent, String child, int childID, String keyValue, String expected) throws IOException {
+    public static void jsonAssertWithUrl(String url, String parent, String child, Integer childID, String keyValue, String expected) throws IOException {
         JsonNode jsonNode = readJsonValaszNode(url);
         if (expected == null) {
             expected = "null";
@@ -18,7 +18,7 @@ public class JsonAssert {
         jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
     }
 
-    public static void jsonAssertWithFile(JsonNode jsonNode, String parent, String child, int childID, String keyValue, String expected) {
+    public static void jsonAssertWithFile(JsonNode jsonNode, String parent, String child, Integer childID, String keyValue, String expected) {
         jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
     }
 
