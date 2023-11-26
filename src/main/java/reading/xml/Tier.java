@@ -1,0 +1,5 @@
+package reading.xml;
+
+public enum Tier {
+    ONE,TWO,THREE,FOUR,FIVE,SIX,ONEATT,TWOATT,THREEATT,FOURATT,FIVEATT,SIXATT
+}
