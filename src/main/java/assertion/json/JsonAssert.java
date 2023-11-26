@@ -22,10 +22,10 @@ public class JsonAssert {
         jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
     }
 
-    public static void jsonAssertion(JsonNode jsonNode, String parent, String child, int childID, String keyValue, String expected) {
+    public static void jsonAssertion(JsonNode jsonNode, String parent, String child, Integer childID, String keyValue, String expected) {
         String actual = null;
         try {
-            if (!Objects.equals(parent, "") && Objects.equals(child, "") && Objects.equals(String.valueOf(childID), "")
+            if (!Objects.equals(parent, "") && Objects.equals(child, "") && Objects.equals(childID, null)
                     && Objects.equals(keyValue, "")) {
                 actual = jsonNode.get(parent).asText();
             } else if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
