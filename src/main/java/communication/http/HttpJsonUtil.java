@@ -1,5 +1,7 @@
 package communication.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.common.RequestType;
 
 import java.io.BufferedReader;
@@ -45,7 +47,7 @@ public class HttpJsonUtil {
         }
     }
 
-    public static String checkAndReturnResponse(HttpURLConnection connection) {
+    public static String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
         try {
         int responseCode = connection.getResponseCode();
         System.out.println("Státuszkód: " + responseCode);
@@ -68,7 +70,7 @@ public class HttpJsonUtil {
     } catch (Exception e) {
             System.out.println("Kivétel volt.: "+e);
     }
-        return response.toString();
+        return prettyPrintJson(response.toString());
     }
 
     private static String readErrorResponse(HttpURLConnection connection) {
@@ -84,5 +86,11 @@ public class HttpJsonUtil {
             System.out.println("Kivétel volt.: "+e);
             return "Nem sikerült az hiba választ beolvasni.";
         }
+    }
+
+    public static String prettyPrintJson(String uglyResponse) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Object jsonObject = objectMapper.readValue(uglyResponse, Object.class);
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
     }
 }
