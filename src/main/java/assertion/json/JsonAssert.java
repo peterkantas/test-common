@@ -25,7 +25,10 @@ public class JsonAssert {
     public static void jsonAssertion(JsonNode jsonNode, String parent, String child, int childID, String keyValue, String expected) {
         String actual = null;
         try {
-            if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
+            if (!Objects.equals(parent, "") && Objects.equals(child, "") && Objects.equals(String.valueOf(childID), "")
+                    && Objects.equals(keyValue, "")) {
+                actual = jsonNode.get(parent).asText();
+            } else if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
                 actual = jsonNode.get(parent).get(0).get(child).get(childID).get(keyValue).asText();
                 assertEquals(expected, actual);
             } else if (parent.equals("") && !Objects.equals(child, "") && !Objects.equals(keyValue, "")) {
