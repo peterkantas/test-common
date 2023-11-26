@@ -19,12 +19,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import static communication.http.HttpJsonUtil.*;
 
 public class CommonUtils {
     private static HttpClient httpClient;
@@ -46,7 +50,7 @@ public class CommonUtils {
 
             httpClient = HttpClient.newBuilder().sslContext(sslContext).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Kivétel volt.: "+e);
         }
         return httpClient;
     }
@@ -68,5 +72,12 @@ public class CommonUtils {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         return builder.parse(new InputSource(new StringReader(response.body())));
+    }
+
+    public static String returnJsonResponse(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
+        URL url = setURL(apiUrl);
+        HttpURLConnection connection = setHttpConnection(url,requestType,headerName,headerValue);
+        sendRequest(connection,commonRequest);
+        return checkAndReturnResponse(connection);
     }
 }
