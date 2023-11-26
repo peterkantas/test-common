@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class HttpJsonUtil {
 
-    public static StringBuilder response = new StringBuilder();
+    public StringBuilder response = new StringBuilder();
     public static URL setURL(String apiUrl) {
         URL url = null;
         try {
@@ -48,7 +48,7 @@ public class HttpJsonUtil {
         }
     }
 
-    public static String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
+    public String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
         try {
         int responseCode = connection.getResponseCode();
         System.out.println("Státuszkód: " + responseCode);

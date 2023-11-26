@@ -1,5 +1,6 @@
 package communication.common;
 
+import communication.http.HttpJsonUtil;
 import communication.http.HttpUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -74,10 +75,11 @@ public class CommonUtils {
         return builder.parse(new InputSource(new StringReader(response.body())));
     }
 
-    public static String returnJsonResponse(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
+    public String returnJsonResponse(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
         URL url = setURL(apiUrl);
         HttpURLConnection connection = setHttpConnection(url,requestType,headerName,headerValue);
         sendRequest(connection,commonRequest);
-        return checkAndReturnResponse(connection);
+        HttpJsonUtil hju = new HttpJsonUtil();
+        return hju.checkAndReturnResponse(connection);
     }
 }

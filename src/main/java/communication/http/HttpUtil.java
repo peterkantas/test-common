@@ -1,5 +1,6 @@
 package communication.http;
 
+import communication.common.CommonUtils;
 import communication.common.RequestType;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -27,7 +28,8 @@ public class HttpUtil {
     }
 
     public static String sendJsonRequest(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
-        return returnJsonResponse(apiUrl,commonRequest,headerName,headerValue,requestType);
+        CommonUtils cu = new CommonUtils();
+        return cu.returnJsonResponse(apiUrl,commonRequest,headerName,headerValue,requestType);
     }
 
     private static void setRequestTypes(String requestBody, String requestURL, String[] headers, RequestType requestType) {
