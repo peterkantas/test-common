@@ -28,6 +28,7 @@ public class JsonAssert {
             if (!Objects.equals(parent, "") && Objects.equals(child, "") && Objects.equals(childID, null)
                     && Objects.equals(keyValue, "")) {
                 actual = jsonNode.get(parent).asText();
+                assertEquals(expected, actual);
             } else if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
                 actual = jsonNode.get(parent).get(0).get(child).get(childID).get(keyValue).asText();
                 assertEquals(expected, actual);
