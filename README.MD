@@ -26,3 +26,8 @@ TCPIP Request.: "sendPipeRequest(String Host, String HostPort, String bbOrg, Str
 
 JAXB Validation.: "String responseString = TestXMLUtil.getStringFromDocument(response);
 responseValidator(JarmuAltalanosValasz.class, xsdPaths, responseString);"
+
+
+Versioning to jitpack.:
+git tag -a 0.0.1-SNAPSHOT -m "commit message"
+$ git push origin --tag
