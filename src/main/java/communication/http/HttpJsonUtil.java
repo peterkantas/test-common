@@ -4,6 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.common.RequestType;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.client.HttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,17 +46,35 @@ public class HttpJsonUtil {
         return connection;
     }
 
-    public static void sendRequest(HttpURLConnection connection, String commonRequest) throws IOException {
+    public static void sendJsonRequestPOST(HttpURLConnection connection, String commonRequest) throws IOException {
         try (OutputStream os = connection.getOutputStream()) {
             byte[] input = commonRequest.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
     }
 
+    public JsonNode sendJsonRequestGET(String url) throws JsonProcessingException {
+        String responseBody = null;
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                 responseBody = EntityUtils.toString(response.getEntity());
+                System.out.println("API response: " + responseBody);
+            } else {
+                System.out.println("HTTP Request failed with status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception.: "+e);
+        }
+        return castStringToJsonNode(responseBody);
+    }
+
     public String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
         try {
         int responseCode = connection.getResponseCode();
-        System.out.println("Státuszkód: " + responseCode);
+        System.out.println("Status Code: " + responseCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
             try (BufferedReader br = new BufferedReader(
@@ -60,16 +83,16 @@ public class HttpJsonUtil {
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
-                System.out.println("API válasz: " + response);
+                System.out.println("API response: " + response);
             }
         } else {
-            System.out.println("Hiba az API hívás során. Válasz: " + readErrorResponse(connection));
+            System.out.println("HTTP Request failed with status code. Response.: " + readErrorResponse(connection));
         }
 
         connection.disconnect();
 
     } catch (Exception e) {
-            System.out.println("Kivétel volt.: "+e);
+            System.out.println("Exception.: "+e);
     }
         return prettyPrintJson(response.toString());
     }
@@ -84,8 +107,8 @@ public class HttpJsonUtil {
             }
             return response.toString();
         } catch (Exception e) {
-            System.out.println("Kivétel volt.: "+e);
-            return "Nem sikerült az hiba választ beolvasni.";
+            System.out.println("Exception.: "+e);
+            return "It was not possible to read the error response.";
         }
     }
 
@@ -95,7 +118,7 @@ public class HttpJsonUtil {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
     }
 
-    public static JsonNode castStringToJsonNode(String response) throws JsonProcessingException {
+    public JsonNode castStringToJsonNode(String response) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readTree(response);
     }

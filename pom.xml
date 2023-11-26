@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hu.kantasp.common.test</groupId>
     <artifactId>systemtest-common</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -20,6 +20,12 @@
             <groupId>org.jxls</groupId>
             <artifactId>jxls-jexcel</artifactId>
             <version>1.0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
         </dependency>
 
         <!-- JUnit5 függőségek -->

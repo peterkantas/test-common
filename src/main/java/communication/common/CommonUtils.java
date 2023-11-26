@@ -1,5 +1,6 @@
 package communication.common;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import communication.http.HttpJsonUtil;
 import communication.http.HttpUtil;
 import org.w3c.dom.Document;
@@ -21,6 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -32,6 +34,7 @@ import java.security.cert.X509Certificate;
 import static communication.http.HttpJsonUtil.*;
 
 public class CommonUtils {
+    HttpJsonUtil hju = new HttpJsonUtil();
     private static HttpClient httpClient;
 
     public static HttpClient makeSSLIgnoreHttpClient() {
@@ -51,7 +54,7 @@ public class CommonUtils {
 
             httpClient = HttpClient.newBuilder().sslContext(sslContext).build();
         } catch (Exception e) {
-            System.out.println("Kivétel volt.: "+e);
+            System.out.println("Exception.: "+e);
         }
         return httpClient;
     }
@@ -75,11 +78,14 @@ public class CommonUtils {
         return builder.parse(new InputSource(new StringReader(response.body())));
     }
 
-    public String returnJsonResponse(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
+    public JsonNode returnJsonResponseGET(String apiUrl) throws IOException {
+
+        return hju.sendJsonRequestGET(apiUrl);
+    }
+    public JsonNode returnJsonResponsePOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
         URL url = setURL(apiUrl);
         HttpURLConnection connection = setHttpConnection(url,requestType,headerName,headerValue);
-        sendRequest(connection,commonRequest);
-        HttpJsonUtil hju = new HttpJsonUtil();
-        return hju.checkAndReturnResponse(connection);
+        sendJsonRequestPOST(connection,commonRequest);
+        return hju.castStringToJsonNode(hju.checkAndReturnResponse(connection));
     }
 }

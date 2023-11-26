@@ -1,5 +1,6 @@
 package communication.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import communication.common.CommonUtils;
 import communication.common.RequestType;
 import org.w3c.dom.Document;
@@ -7,18 +8,14 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.net.ProtocolException;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
 import static communication.common.CommonUtils.*;
-import static communication.http.HttpJsonUtil.setHttpConnection;
-import static communication.http.HttpJsonUtil.setURL;
 
 public class HttpUtil {
-
+    CommonUtils cu = new CommonUtils();
     public static HttpRequest request;
     public static HttpClient httpClient = makeSSLIgnoreHttpClient();
 
@@ -27,9 +24,12 @@ public class HttpUtil {
         return returnDocumentTypeResponse(httpClient);
     }
 
-    public static String sendJsonRequest(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) throws IOException {
-        CommonUtils cu = new CommonUtils();
-        return cu.returnJsonResponse(apiUrl,commonRequest,headerName,headerValue,requestType);
+    public JsonNode sendJsonRequestPOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
+        return cu.returnJsonResponsePOST(apiUrl,commonRequest,headerName,headerValue,requestType);
+    }
+
+    public JsonNode sendJsonRequestGET(String url) throws IOException {
+        return cu.returnJsonResponseGET(url);
     }
 
     private static void setRequestTypes(String requestBody, String requestURL, String[] headers, RequestType requestType) {
