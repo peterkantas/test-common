@@ -1,6 +1,7 @@
 package communication.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.common.RequestType;
 
@@ -92,5 +93,10 @@ public class HttpJsonUtil {
         ObjectMapper objectMapper = new ObjectMapper();
         Object jsonObject = objectMapper.readValue(uglyResponse, Object.class);
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
+    }
+
+    public static JsonNode castStringToJsonNode(String response) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readTree(response);
     }
 }

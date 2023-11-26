@@ -1,8 +1,11 @@
 package communication.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import communication.common.CommonUtils;
 import communication.common.RequestType;
 import org.w3c.dom.Document;
+
+import static communication.http.HttpJsonUtil.castStringToJsonNode;
 
 public class HttpHelper {
 
@@ -19,14 +22,14 @@ public class HttpHelper {
         }
     }
 
-  public static String sendPOSTJSONRequest(String apiUrl, String commonRequest, String headerName,String headerValue, RequestType requestType) {
+  public static JsonNode sendPOSTJSONRequest(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) {
         try {
             System.out.println("Kérdés --------------");
             System.out.println(commonRequest);
             System.out.println("Válasz --------------");
             var response = HttpUtil.sendJsonRequest(apiUrl,commonRequest,headerName,headerValue,requestType);
             System.out.println(response);
-            return response;
+            return castStringToJsonNode(response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
