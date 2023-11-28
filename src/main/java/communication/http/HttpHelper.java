@@ -7,6 +7,7 @@ import org.w3c.dom.Document;
 
 public class HttpHelper {
     HttpUtil httpUtil = new HttpUtil();
+
     public static Document sendPOSTXMLRequest(String requestURL, String[] headers, String requestBody) {
         try {
             System.out.println("Kérdés --------------");

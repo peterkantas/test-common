@@ -22,7 +22,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -34,8 +33,8 @@ import java.security.cert.X509Certificate;
 import static communication.http.HttpJsonUtil.*;
 
 public class CommonUtils {
-    HttpJsonUtil hju = new HttpJsonUtil();
     private static HttpClient httpClient;
+    HttpJsonUtil hju = new HttpJsonUtil();
 
     public static HttpClient makeSSLIgnoreHttpClient() {
         try {
@@ -54,7 +53,7 @@ public class CommonUtils {
 
             httpClient = HttpClient.newBuilder().sslContext(sslContext).build();
         } catch (Exception e) {
-            System.out.println("Exception.: "+e);
+            System.out.println("Exception.: " + e);
         }
         return httpClient;
     }
@@ -79,13 +78,13 @@ public class CommonUtils {
     }
 
     public JsonNode returnJsonResponseGET(String apiUrl) throws IOException {
-
         return hju.sendJsonRequestGET(apiUrl);
     }
+
     public JsonNode returnJsonResponsePOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
         URL url = setURL(apiUrl);
-        HttpURLConnection connection = setHttpConnection(url,requestType,headerName,headerValue);
-        sendJsonRequestPOST(connection,commonRequest);
+        HttpURLConnection connection = setHttpConnection(url, requestType, headerName, headerValue);
+        sendJsonRequestPOST(connection, commonRequest);
         return hju.castStringToJsonNode(hju.checkAndReturnResponse(connection));
     }
 }

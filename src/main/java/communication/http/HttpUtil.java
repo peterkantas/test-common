@@ -12,24 +12,17 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
-import static communication.common.CommonUtils.*;
+import static communication.common.CommonUtils.makeSSLIgnoreHttpClient;
+import static communication.common.CommonUtils.returnDocumentTypeResponse;
 
 public class HttpUtil {
-    CommonUtils cu = new CommonUtils();
     public static HttpRequest request;
     public static HttpClient httpClient = makeSSLIgnoreHttpClient();
+    CommonUtils cu = new CommonUtils();
 
     public static Document sendXMLRequest(String requestBody, String requestURL, String[] headers, RequestType requestType) throws IOException, InterruptedException, SAXException, ParserConfigurationException {
         setRequestTypes(requestBody, requestURL, headers, requestType);
         return returnDocumentTypeResponse(httpClient);
-    }
-
-    public JsonNode sendJsonRequestPOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
-        return cu.returnJsonResponsePOST(apiUrl,commonRequest,headerName,headerValue,requestType);
-    }
-
-    public JsonNode sendJsonRequestGET(String url) throws IOException {
-        return cu.returnJsonResponseGET(url);
     }
 
     private static void setRequestTypes(String requestBody, String requestURL, String[] headers, RequestType requestType) {
@@ -42,6 +35,14 @@ public class HttpUtil {
                     request = HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(headers).DELETE().build();
         }
 
+    }
+
+    public JsonNode sendJsonRequestPOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
+        return cu.returnJsonResponsePOST(apiUrl, commonRequest, headerName, headerValue, requestType);
+    }
+
+    public JsonNode sendJsonRequestGET(String url) throws IOException {
+        return cu.returnJsonResponseGET(url);
     }
 
 }

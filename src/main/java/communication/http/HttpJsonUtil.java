@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.common.RequestType;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.client.HttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 public class HttpJsonUtil {
 
     public StringBuilder response = new StringBuilder();
+
     public static URL setURL(String apiUrl) {
         URL url = null;
         try {
@@ -33,7 +35,7 @@ public class HttpJsonUtil {
         return url;
     }
 
-    public static HttpURLConnection setHttpConnection(URL url, RequestType requestType,String headerName,String headerValue) throws ProtocolException {
+    public static HttpURLConnection setHttpConnection(URL url, RequestType requestType, String headerName, String headerValue) throws ProtocolException {
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
@@ -41,7 +43,7 @@ public class HttpJsonUtil {
             throw new RuntimeException(ex);
         }
         connection.setRequestMethod(String.valueOf(requestType));
-        connection.setRequestProperty(headerName,headerValue);
+        connection.setRequestProperty(headerName, headerValue);
         connection.setDoOutput(true);
         return connection;
     }
@@ -51,50 +53,6 @@ public class HttpJsonUtil {
             byte[] input = commonRequest.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
-    }
-
-    public JsonNode sendJsonRequestGET(String url) throws JsonProcessingException {
-        String responseBody = null;
-        try {
-            HttpClient httpClient = HttpClients.createDefault();
-            HttpGet httpGet = new HttpGet(url);
-            HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                 responseBody = EntityUtils.toString(response.getEntity());
-                System.out.println("API response: " + responseBody);
-            } else {
-                System.out.println("HTTP Request failed with status code: " + response.getStatusLine().getStatusCode());
-            }
-        } catch (Exception e) {
-            System.out.println("Exception.: "+e);
-        }
-        return castStringToJsonNode(responseBody);
-    }
-
-    public String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
-        try {
-        int responseCode = connection.getResponseCode();
-        System.out.println("Status Code: " + responseCode);
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                System.out.println("API response: " + response);
-            }
-        } else {
-            System.out.println("HTTP Request failed with status code. Response.: " + readErrorResponse(connection));
-        }
-
-        connection.disconnect();
-
-    } catch (Exception e) {
-            System.out.println("Exception.: "+e);
-    }
-        return prettyPrintJson(response.toString());
     }
 
     private static String readErrorResponse(HttpURLConnection connection) {
@@ -107,7 +65,7 @@ public class HttpJsonUtil {
             }
             return response.toString();
         } catch (Exception e) {
-            System.out.println("Exception.: "+e);
+            System.out.println("Exception.: " + e);
             return "It was not possible to read the error response.";
         }
     }
@@ -116,6 +74,68 @@ public class HttpJsonUtil {
         ObjectMapper objectMapper = new ObjectMapper();
         Object jsonObject = objectMapper.readValue(uglyResponse, Object.class);
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
+    }
+
+    public JsonNode sendJsonRequestGET(String url) throws JsonProcessingException {
+        String responseBody = null;
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                responseBody = EntityUtils.toString(response.getEntity());
+                System.out.println("API response: " + responseBody);
+            } else {
+                System.out.println("HTTP Request failed with status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception.: " + e);
+        }
+        return castStringToJsonNode(responseBody);
+    }
+
+    public JsonNode sendJsonRequestDELETE(String url) throws JsonProcessingException {
+        String responseBody = null;
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpDelete httpDel = new HttpDelete(url);
+            HttpResponse response = httpClient.execute(httpDel);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                responseBody = EntityUtils.toString(response.getEntity());
+                System.out.println("API response: " + responseBody);
+            } else {
+                System.out.println("HTTP Request failed with status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception.: " + e);
+        }
+        return castStringToJsonNode(responseBody);
+    }
+
+    public String checkAndReturnResponse(HttpURLConnection connection) throws JsonProcessingException {
+        try {
+            int responseCode = connection.getResponseCode();
+            System.out.println("Status Code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println("API response: " + response);
+                }
+            } else {
+                System.out.println("HTTP Request failed with status code. Response.: " + readErrorResponse(connection));
+            }
+
+            connection.disconnect();
+
+        } catch (Exception e) {
+            System.out.println("Exception.: " + e);
+        }
+        return prettyPrintJson(response.toString());
     }
 
     public JsonNode castStringToJsonNode(String response) throws JsonProcessingException {
