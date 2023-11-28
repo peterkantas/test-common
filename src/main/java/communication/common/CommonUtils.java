@@ -81,6 +81,10 @@ public class CommonUtils {
         return hju.sendJsonRequestGET(apiUrl);
     }
 
+    public JsonNode returnJsonResponseDELETE(String apiUrl) throws IOException {
+        return hju.sendJsonRequestDELETE(apiUrl);
+    }
+
     public JsonNode returnJsonResponsePOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
         URL url = setURL(apiUrl);
         HttpURLConnection connection = setHttpConnection(url, requestType, headerName, headerValue);

@@ -45,4 +45,8 @@ public class HttpUtil {
         return cu.returnJsonResponseGET(url);
     }
 
+    public JsonNode sendJsonRequestDELETE(String url) throws IOException {
+        return cu.returnJsonResponseDELETE(url);
+    }
+
 }

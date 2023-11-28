@@ -45,6 +45,7 @@ public class HttpHelper {
                 case POST ->
                         response = httpUtil.sendJsonRequestPOST(apiUrl, commonRequest, headerName, headerValue, requestType);
                 case GET -> response = httpUtil.sendJsonRequestGET(apiUrl);
+                case DELETE -> response = httpUtil.sendJsonRequestDELETE(apiUrl);
             }
             System.out.println(response);
             return response;
