@@ -77,8 +77,8 @@ public class CommonUtils {
         return builder.parse(new InputSource(new StringReader(response.body())));
     }
 
-    public JsonNode returnJsonResponseGET(String apiUrl) throws IOException {
-        return hju.sendJsonRequestGET(apiUrl);
+    public JsonNode returnJsonResponseGET(RequestType requestType,String apiUrl) throws IOException {
+        return hju.sendJsonRequestGET(requestType,apiUrl);
     }
 
     public JsonNode returnJsonResponseDELETE(String apiUrl) throws IOException {
