@@ -29,5 +29,5 @@ responseValidator(JarmuAltalanosValasz.class, xsdPaths, responseString);"
 
 
 Versioning to jitpack.:
-git tag -a 1.1.5 -m "v1.1.5"
+git tag -a 1.1.6 -m "v1.1.6"
 git push origin --tag

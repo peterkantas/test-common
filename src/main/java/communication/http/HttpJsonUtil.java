@@ -83,7 +83,7 @@ public class HttpJsonUtil {
             HttpGet httpGet = new HttpGet(url);
             HttpResponse response = httpClient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == 200 ||
-                    (requestType.equals(RequestType.GET) && response.getStatusLine().getStatusCode() == 404)) {
+                response.getStatusLine().getStatusCode() == 404) {
                 responseBody = EntityUtils.toString(response.getEntity());
                 System.out.println("API response: " + responseBody);
             } else {
