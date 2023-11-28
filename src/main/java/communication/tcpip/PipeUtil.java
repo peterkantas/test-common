@@ -34,7 +34,7 @@ public class PipeUtil {
             outputStream.write(("BB|" + bborganization + "|" + bbuser + "|" + password + "|\r\n").getBytes(Charset.forName("ISO-8859-2")));
             outputStream.flush();
 
-            scanner.nextLine(); // read welcome
+            scanner.nextLine();
 
             return new PipeUtil(socket, outputStream, scanner);
         } catch (IOException e) {

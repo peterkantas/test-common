@@ -8,7 +8,7 @@ import java.net.URL;
 
 public class ReadJsonNode {
 
-    public static JsonNode readJsonValaszNode(String uri) throws IOException {
+    public static JsonNode readJsonResponseNode(String uri) throws IOException {
         URL url = new URL(uri);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(url);

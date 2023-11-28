@@ -10,9 +10,9 @@ public class HttpHelper {
 
     public static Document sendPOSTXMLRequest(String requestURL, String[] headers, String requestBody) {
         try {
-            System.out.println("Kérdés --------------");
+            System.out.println("Request --------------");
             System.out.println(requestBody);
-            System.out.println("Válasz --------------");
+            System.out.println("Response --------------");
             var response = HttpUtil.sendXMLRequest(requestBody, requestURL, headers, RequestType.POST);
             CommonUtils.printDocument(response);
             return response;
@@ -24,9 +24,9 @@ public class HttpHelper {
     public static Document sendXMLRequestGET(String requestURL, String[] headers, String requestBody) {
         try {
 
-            System.out.println("Kérdés --------------");
+            System.out.println("Request --------------");
             System.out.println(requestBody);
-            System.out.println("Válasz --------------");
+            System.out.println("Response --------------");
             var response = HttpUtil.sendXMLRequest(requestBody, requestURL, headers, RequestType.GET);
             CommonUtils.printDocument(response);
             return response;
@@ -38,13 +38,17 @@ public class HttpHelper {
     public JsonNode sendJSONRequest(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) {
         JsonNode response = null;
         try {
-            System.out.println("Kérdés --------------");
-            System.out.println(commonRequest);
-            System.out.println("Válasz --------------");
+            System.out.println("Request --------------");
+            if (requestType.equals(RequestType.GET) ||requestType.equals(RequestType.DELETE)) {
+                System.out.println("No request body, because of the request type.");    
+            } else {
+                System.out.println(commonRequest);
+            }
+            System.out.println("Response --------------");
             switch (requestType) {
                 case POST ->
                         response = httpUtil.sendJsonRequestPOST(apiUrl, commonRequest, headerName, headerValue, requestType);
-                case GET -> response = httpUtil.sendJsonRequestGET(requestType,apiUrl);
+                case GET -> response = httpUtil.sendJsonRequestGET(apiUrl);
                 case DELETE -> response = httpUtil.sendJsonRequestDELETE(apiUrl);
             }
             System.out.println(response);

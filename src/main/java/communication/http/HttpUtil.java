@@ -41,8 +41,8 @@ public class HttpUtil {
         return cu.returnJsonResponsePOST(apiUrl, commonRequest, headerName, headerValue, requestType);
     }
 
-    public JsonNode sendJsonRequestGET(RequestType requestType,String url) throws IOException {
-        return cu.returnJsonResponseGET(requestType,url);
+    public JsonNode sendJsonRequestGET(String url) throws IOException {
+        return cu.returnJsonResponseGET(url);
     }
 
     public JsonNode sendJsonRequestDELETE(String url) throws IOException {

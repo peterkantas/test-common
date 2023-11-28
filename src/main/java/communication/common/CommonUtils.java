@@ -40,10 +40,10 @@ public class CommonUtils {
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
                 }
 
-                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
                 }
 
                 public X509Certificate[] getAcceptedIssuers() {
@@ -77,8 +77,8 @@ public class CommonUtils {
         return builder.parse(new InputSource(new StringReader(response.body())));
     }
 
-    public JsonNode returnJsonResponseGET(RequestType requestType,String apiUrl) throws IOException {
-        return hju.sendJsonRequestGET(requestType,apiUrl);
+    public JsonNode returnJsonResponseGET(String apiUrl) throws IOException {
+        return hju.sendJsonRequestGET(apiUrl);
     }
 
     public JsonNode returnJsonResponseDELETE(String apiUrl) throws IOException {

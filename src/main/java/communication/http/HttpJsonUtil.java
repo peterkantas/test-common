@@ -76,7 +76,7 @@ public class HttpJsonUtil {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
     }
 
-    public JsonNode sendJsonRequestGET(RequestType requestType,String url) throws JsonProcessingException {
+    public JsonNode sendJsonRequestGET(String url) throws JsonProcessingException {
         String responseBody = null;
         try {
             HttpClient httpClient = HttpClients.createDefault();

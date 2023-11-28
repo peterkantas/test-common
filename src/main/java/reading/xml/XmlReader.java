@@ -21,7 +21,7 @@ public class XmlReader {
                 result = node != null && node.getTextContent().equals(tagValue);
             }
             if (!result) {
-                System.out.println("tagnev: " + tagName + "|" + (node != null ? node.getTextContent() : "<üres>"));
+                System.out.println("tagname: " + tagName + "|" + (node != null ? node.getTextContent() : "<empty>"));
             }
             return result;
         } catch (XPathExpressionException e) {

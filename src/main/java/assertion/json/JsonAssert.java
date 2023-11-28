@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static reading.json.ReadJsonNode.readJsonValaszNode;
+import static reading.json.ReadJsonNode.readJsonResponseNode;
 
 
 public class JsonAssert {
     public static void jsonAssertWithUrl(String url, String parent, String child, Integer childID, String keyValue, String expected) throws IOException {
-        JsonNode jsonNode = readJsonValaszNode(url);
+        JsonNode jsonNode = readJsonResponseNode(url);
         if (expected == null) {
             expected = "null";
         }
@@ -39,14 +39,14 @@ public class JsonAssert {
                 actual = jsonNode.get(child).asText().replace("\n", "").replace("\r", "");
                 assertEquals(expected, actual);
             } else {
-                System.out.println("Itt valami nagyon nincs rendjén.");
+                System.out.println("Something is wrong.");
             }
         } catch (AssertionError aE) {
             if (keyValue.equals("")) {
-                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + child + "  Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " + actual);
+                System.out.println("Failed to check the response.:" + child + "  Difference between expected and actual value Expected value: " + expected + " Actual value: " + actual);
                 throw aE;
             } else {
-                System.out.println("Elbukott egy ellenőrzés a válasz vizsgálatában.:" + keyValue + "   Különbség az elvárt és a tényleges érték között Elvárt érték: " + expected + " Tényleges érték: " + actual);
+                System.out.println("Failed to check the response.:" + keyValue + "   Difference between expected and actual value Expected value: " + expected + " Actual value: " + actual);
             }
         }
     }

@@ -19,9 +19,9 @@ public class PipeHelper {
     public static String sendPipeRequestBBAuth(String Host, String HostPort, String bbOrg, String bbUser, String requestString) {
         try {
             PipeUtil pu = PipeUtil.connectBBAuth(Host, HostPort, bbOrg, bbUser);
-            System.out.println("KÉRDÉS.: " + requestString);
+            System.out.println("Request.: " + requestString);
             String response = pu.sendMessage(requestString);
-            System.out.println("VÁLASZ.: " + response);
+            System.out.println("Response.: " + response);
             pu.finalizer();
             return response;
         } catch (Exception e) {
