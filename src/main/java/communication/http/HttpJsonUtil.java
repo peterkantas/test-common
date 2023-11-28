@@ -76,13 +76,14 @@ public class HttpJsonUtil {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
     }
 
-    public JsonNode sendJsonRequestGET(String url) throws JsonProcessingException {
+    public JsonNode sendJsonRequestGET(RequestType requestType,String url) throws JsonProcessingException {
         String responseBody = null;
         try {
             HttpClient httpClient = HttpClients.createDefault();
             HttpGet httpGet = new HttpGet(url);
             HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == 200 ||
+                    (requestType.equals(RequestType.GET) && response.getStatusLine().getStatusCode() == 404)) {
                 responseBody = EntityUtils.toString(response.getEntity());
                 System.out.println("API response: " + responseBody);
             } else {
