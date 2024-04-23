@@ -1,58 +1,64 @@
-package communication.tcpip;
+package communication.tcpip
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Scanner;
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.Socket
+import java.util.*
 
-public class PipeHelper {
-    private static OutputStream outputStream;
-    private static InputStream inputStream;
-
-    public static String sendPipeRequestWithoutAuth(String host,int port,String message) {
-        PipeHelper interFaceSocket;
-        interFaceSocket = PipeHelper.connect(host,port);
-        return interFaceSocket.sendPipeReplyMessage(message);
+class PipeHelper(outputStream: OutputStream, inputStream: InputStream) {
+    init {
+        Companion.outputStream = outputStream
+        Companion.inputStream = inputStream
     }
 
-    public static String sendPipeRequestBBAuth(String Host, String HostPort, String bbOrg, String bbUser, String requestString) {
-        try {
-            PipeUtil pu = PipeUtil.connectBBAuth(Host, HostPort, bbOrg, bbUser);
-            System.out.println("Request.: " + requestString);
-            String response = pu.sendMessage(requestString);
-            System.out.println("Response.: " + response);
-            pu.finalizer();
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    fun sendPipeReplyMessage(message: String): String {
+        return try {
+            outputStream.write((message + "\r\n").toByteArray())
+            outputStream.flush()
+            val sc = Scanner(inputStream, "ISO-8859-2")
+            sc.nextLine()
+        } catch (e: IOException) {
+            throw RuntimeException(e)
         }
     }
 
-    public PipeHelper(OutputStream outputStream, InputStream inputStream) {
-        PipeHelper.outputStream = outputStream;
-        PipeHelper.inputStream = inputStream;
-    }
-
-    public static PipeHelper connect(String host, int port) {
-        try {
-            Socket socket = new Socket(host, port);
-            OutputStream outputStream = socket.getOutputStream();
-            InputStream is = socket.getInputStream();
-            return new PipeHelper(outputStream, is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    companion object {
+        private lateinit var outputStream: OutputStream
+        private lateinit var inputStream: InputStream
+        fun sendPipeRequestWithoutAuth(host: String, port: Int, message: String): String {
+            val interFaceSocket: PipeHelper = connect(host, port)
+            return interFaceSocket.sendPipeReplyMessage(message)
         }
-    }
 
-    public String sendPipeReplyMessage(String message) {
-        try {
-            outputStream.write((message + "\r\n").getBytes());
-            outputStream.flush();
-            Scanner sc = new Scanner(inputStream, "ISO-8859-2");
-            return sc.nextLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        fun sendPipeRequestBBAuth(
+            Host: String,
+            HostPort: String,
+            bbOrg: String,
+            bbUser: String,
+            requestString: String
+        ): String {
+            return try {
+                val pu = PipeUtil.connectBBAuth(Host, HostPort, bbOrg, bbUser)
+                println("Request.: $requestString")
+                val response = pu.sendMessage(requestString)
+                println("Response.: $response")
+                pu.finalizer()
+                response
+            } catch (e: Exception) {
+                throw RuntimeException(e)
+            }
+        }
+
+        fun connect(host: String, port: Int): PipeHelper {
+            return try {
+                val socket = Socket(host, port)
+                val outputStream = socket.getOutputStream()
+                val `is` = socket.getInputStream()
+                PipeHelper(outputStream, `is`)
+            } catch (e: IOException) {
+                throw RuntimeException(e)
+            }
         }
     }
 }

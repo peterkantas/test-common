@@ -1,5 +1,9 @@
-package communication.common;
+package communication.common
 
-public enum RequestType {
-    POST, GET, PUT, PATCH, DELETE
+enum class RequestType {
+    POST,
+    GET,
+    PUT,
+    PATCH,
+    DELETE
 }

@@ -1,60 +1,87 @@
-package communication.http;
+package communication.http
 
-import com.fasterxml.jackson.databind.JsonNode;
-import communication.common.CommonUtils;
-import communication.common.RequestType;
-import org.w3c.dom.Document;
+import com.fasterxml.jackson.databind.JsonNode
+import communication.common.CommonUtils
+import communication.common.RequestType
+import communication.http.HttpUtil.Companion.sendJsonRequest
+import communication.http.HttpUtil.Companion.sendXMLRequest
+import org.w3c.dom.Document
 
-public class HttpHelper {
-    HttpUtil httpUtil = new HttpUtil();
-
-    public static Document sendPOSTXMLRequest(String requestURL, String[] headers, String requestBody) {
-        try {
-            System.out.println("Request --------------");
-            System.out.println(requestBody);
-            System.out.println("Response --------------");
-            var response = HttpUtil.sendXMLRequest(requestBody, requestURL, headers, RequestType.POST);
-            CommonUtils.printDocument(response);
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+class HttpHelper {
+    var httpUtil = HttpUtil()
+    fun sendJSONPOSTRequest(requestURL: String, headers: Array<String>, requestBody: String): JsonNode {
+        println("Kérdés --------------")
+        println(requestBody)
+        println("Válasz --------------")
+        return try {
+            sendJsonRequest(requestBody, requestURL, headers, RequestType.POST)
+        } catch (e: Exception) {
+            throw RuntimeException(e)
         }
     }
 
-    public static Document sendXMLRequestGET(String requestURL, String[] headers, String requestBody) {
-        try {
-
-            System.out.println("Request --------------");
-            System.out.println(requestBody);
-            System.out.println("Response --------------");
-            var response = HttpUtil.sendXMLRequest(requestBody, requestURL, headers, RequestType.GET);
-            CommonUtils.printDocument(response);
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public JsonNode sendJSONRequest(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) {
-        JsonNode response = null;
-        try {
-            System.out.println("Request --------------");
-            if (requestType.equals(RequestType.GET) ||requestType.equals(RequestType.DELETE)) {
-                System.out.println("No request body, because of the request type.");    
+    fun sendJSONRequest(
+        apiUrl: String,
+        commonRequest: String,
+        headerName: String,
+        headerValue: String,
+        requestType: RequestType
+    ): JsonNode {
+        val response: JsonNode
+        return try {
+            println("Request --------------")
+            if (requestType == RequestType.GET || requestType == RequestType.DELETE) {
+                println("No request body, because of the request type.")
             } else {
-                System.out.println(commonRequest);
+                println(commonRequest)
             }
-            System.out.println("Response --------------");
-            switch (requestType) {
-                case POST ->
-                        response = httpUtil.sendJsonRequestPOST(apiUrl, commonRequest, headerName, headerValue, requestType);
-                case GET -> response = httpUtil.sendJsonRequestGET(apiUrl);
-                case DELETE -> response = httpUtil.sendJsonRequestDELETE(apiUrl);
+            println("Response --------------")
+            response = when (requestType) {
+                RequestType.POST -> httpUtil.sendJsonRequestPOST(
+                    apiUrl,
+                    commonRequest,
+                    headerName,
+                    headerValue,
+                    requestType
+                )
+
+                RequestType.GET -> httpUtil.sendJsonRequestGET(apiUrl)
+                RequestType.DELETE -> httpUtil.sendJsonRequestDELETE(apiUrl)
+                RequestType.PUT -> TODO()
+                RequestType.PATCH -> TODO()
             }
-            System.out.println(response);
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            println(response)
+            response
+        } catch (e: java.lang.Exception) {
+            throw java.lang.RuntimeException(e)
+        }
+    }
+
+    companion object {
+        fun sendPOSTXMLRequest(requestURL: String, headers: Array<String>, requestBody: String): Document {
+            return try {
+                println("Request --------------")
+                println(requestBody)
+                println("Response --------------")
+                val response = sendXMLRequest(requestBody, requestURL, headers, RequestType.POST)
+                CommonUtils.printDocument(response)
+                response
+            } catch (e: java.lang.Exception) {
+                throw java.lang.RuntimeException(e)
+            }
+        }
+
+        fun sendXMLRequestGET(requestURL: String, headers: Array<String>, requestBody: String): Document {
+            return try {
+                println("Request --------------")
+                println(requestBody)
+                println("Response --------------")
+                val response = sendXMLRequest(requestBody, requestURL, headers, RequestType.GET)
+                CommonUtils.printDocument(response)
+                response
+            } catch (e: java.lang.Exception) {
+                throw java.lang.RuntimeException(e)
+            }
         }
     }
 }

@@ -1,65 +1,61 @@
-package communication.tcpip;
+package communication.tcpip
 
-import org.springframework.util.DigestUtils;
+import org.springframework.util.DigestUtils
+import java.io.IOException
+import java.io.OutputStream
+import java.net.Socket
+import java.nio.charset.Charset
+import java.util.*
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.util.Scanner;
+class PipeUtil {
+    private lateinit var socket: Socket
+    private lateinit var outputStream: OutputStream
+    private lateinit var scanner: Scanner
 
-
-public class PipeUtil {
-
-    private Socket socket;
-    private OutputStream outputStream;
-    private Scanner scanner;
-
-    public PipeUtil(Socket socket, OutputStream outputStream, Scanner scanner) {
-        this.scanner = scanner;
-        this.socket = socket;
-        this.outputStream = outputStream;
+    constructor(socket: Socket, outputStream: OutputStream, scanner: Scanner) {
+        this.scanner = scanner
+        this.socket = socket
+        this.outputStream = outputStream
     }
 
-    public static PipeUtil connectBBAuth(String Host, String interfacePort, String bborganization, String bbuser) {
-        try {
-            Socket socket = new Socket(Host, Integer.parseInt(interfacePort));
-            OutputStream outputStream = socket.getOutputStream();
-            InputStream is = socket.getInputStream();
-            Scanner scanner = new Scanner(is, "ISO-8859-2");
-            String welcomeMessage = scanner.nextLine();
-            String password = DigestUtils.md5DigestAsHex((welcomeMessage + "jelszo").getBytes()).toUpperCase();
+    private constructor()
 
-            outputStream.write(("BB|" + bborganization + "|" + bbuser + "|" + password + "|\r\n").getBytes(Charset.forName("ISO-8859-2")));
-            outputStream.flush();
-
-            scanner.nextLine();
-
-            return new PipeUtil(socket, outputStream, scanner);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    @Throws(IOException::class)
+    fun sendMessage(message: String): String {
+        return try {
+            outputStream.write((message + "\r\n").toByteArray(charset("ISO-8859-2")))
+            outputStream.flush()
+            scanner.nextLine()
+        } catch (e: IOException) {
+            throw RuntimeException(e)
         }
     }
 
-    private void PipeUtil() {
-    }
-
-    public String sendMessage(String message) throws IOException {
+    protected fun finalizer() {
         try {
-            outputStream.write((message + "\r\n").getBytes("ISO-8859-2"));
-            outputStream.flush();
-            return scanner.nextLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            socket.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
-    protected void finalizer() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    companion object {
+        fun connectBBAuth(Host: String, interfacePort: String, bborganization: String, bbuser: String): PipeUtil {
+            return try {
+                val socket = Socket(Host, interfacePort.toInt())
+                val outputStream = socket.getOutputStream()
+                val `is` = socket.getInputStream()
+                val scanner = Scanner(`is`, "ISO-8859-2")
+                val welcomeMessage = scanner.nextLine()
+                val password =
+                    DigestUtils.md5DigestAsHex((welcomeMessage + "jelszo").toByteArray()).uppercase(Locale.getDefault())
+                outputStream.write("BB|$bborganization|$bbuser|$password|\r\n".toByteArray(Charset.forName("ISO-8859-2")))
+                outputStream.flush()
+                scanner.nextLine()
+                PipeUtil(socket, outputStream, scanner)
+            } catch (e: IOException) {
+                throw RuntimeException(e)
+            }
         }
     }
 }

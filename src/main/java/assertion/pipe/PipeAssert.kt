@@ -1,10 +1,10 @@
-package assertion.pipe;
+package assertion.pipe
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions
 
-public class PipeAssert {
-    public static void pipeAssertion(String pipeResponse, Integer number, String assertingValue) {
-        String[] splittedPipeResponse = pipeResponse.split("\\|");
-        assertEquals(assertingValue, splittedPipeResponse[number]);
+object PipeAssert {
+    fun pipeAssertion(pipeResponse: String, number: Int, assertingValue: String) {
+        val splittedPipeResponse = pipeResponse.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        Assertions.assertEquals(assertingValue, splittedPipeResponse[number])
     }
 }

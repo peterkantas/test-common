@@ -1,94 +1,105 @@
-package communication.common;
+package communication.common
 
-import com.fasterxml.jackson.databind.JsonNode;
-import communication.http.HttpJsonUtil;
-import communication.http.HttpUtil;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import com.fasterxml.jackson.databind.JsonNode
+import communication.http.HttpJsonUtil
+import communication.http.HttpJsonUtil.Companion.sendJsonRequestPOST
+import communication.http.HttpJsonUtil.Companion.setHttpConnection
+import communication.http.HttpJsonUtil.Companion.setURL
+import communication.http.HttpUtil
+import org.w3c.dom.Document
+import org.xml.sax.InputSource
+import org.xml.sax.SAXException
+import java.io.IOException
+import java.io.StringReader
+import java.net.http.HttpClient
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerException
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+class CommonUtils {
+    var hju = HttpJsonUtil()
+    @Throws(IOException::class)
+    fun returnJsonResponseGET(apiUrl: String): JsonNode {
+        return hju.sendJsonRequestGET(apiUrl)
+    }
 
-import static communication.http.HttpJsonUtil.*;
+    @Throws(IOException::class)
+    fun returnJsonResponseDELETE(apiUrl: String): JsonNode {
+        return hju.sendJsonRequestDELETE(apiUrl)
+    }
 
-public class CommonUtils {
-    private static HttpClient httpClient;
-    HttpJsonUtil hju = new HttpJsonUtil();
+    @Throws(IOException::class)
+    fun returnJsonResponsePOST(
+        apiUrl: String,
+        commonRequest: String,
+        headerName: String,
+        headerValue: String,
+        requestType: RequestType
+    ): JsonNode {
+        val url = setURL(apiUrl)
+        val connection = setHttpConnection(url, requestType, headerName, headerValue)
+        sendJsonRequestPOST(connection, commonRequest)
+        return hju.castStringToJsonNode(hju.checkAndReturnResponse(connection))
+    }
 
-    public static HttpClient makeSSLIgnoreHttpClient() {
-        try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                }
-
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-            }}, new SecureRandom());
-
-            httpClient = HttpClient.newBuilder().sslContext(sslContext).build();
-        } catch (Exception e) {
-            System.out.println("Exception.: " + e);
+    companion object {
+        private lateinit var httpClient: HttpClient
+        fun makeSSLIgnoreHttpClient(): HttpClient {
+            try {
+                val sslContext = SSLContext.getInstance("TLS")
+                sslContext.init(null, arrayOf<TrustManager>(object : X509TrustManager {
+                    override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                    override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate?> {
+                        return arrayOfNulls(0)
+                    }
+                }), SecureRandom())
+                httpClient = HttpClient.newBuilder().sslContext(sslContext).build()
+            } catch (e: Exception) {
+                println("Exception.: $e")
+            }
+            return httpClient
         }
-        return httpClient;
-    }
 
-    public static void printDocument(Document xmlDocument) {
-        Transformer tform = null;
-        try {
-            tform = TransformerFactory.newInstance().newTransformer();
-            tform.setOutputProperty(OutputKeys.INDENT, "yes");
-            tform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            tform.transform(new DOMSource(xmlDocument), new StreamResult(System.out));
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
+        fun printDocument(xmlDocument: Document?) {
+            val tform: Transformer
+            try {
+                tform = TransformerFactory.newInstance().newTransformer()
+                tform.setOutputProperty(OutputKeys.INDENT, "yes")
+                tform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+                tform.transform(DOMSource(xmlDocument), StreamResult(System.out))
+            } catch (e: TransformerException) {
+                throw RuntimeException(e)
+            }
         }
-    }
 
-    public static Document returnDocumentTypeResponse(HttpClient ignoreSSLHttpClient) throws IOException, InterruptedException, ParserConfigurationException, SAXException {
-        HttpResponse<String> response = ignoreSSLHttpClient.send(HttpUtil.request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(new InputSource(new StringReader(response.body())));
-    }
-
-    public JsonNode returnJsonResponseGET(String apiUrl) throws IOException {
-        return hju.sendJsonRequestGET(apiUrl);
-    }
-
-    public JsonNode returnJsonResponseDELETE(String apiUrl) throws IOException {
-        return hju.sendJsonRequestDELETE(apiUrl);
-    }
-
-    public JsonNode returnJsonResponsePOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
-        URL url = setURL(apiUrl);
-        HttpURLConnection connection = setHttpConnection(url, requestType, headerName, headerValue);
-        sendJsonRequestPOST(connection, commonRequest);
-        return hju.castStringToJsonNode(hju.checkAndReturnResponse(connection));
+        @Throws(
+            IOException::class,
+            InterruptedException::class,
+            ParserConfigurationException::class,
+            SAXException::class
+        )
+        fun returnDocumentTypeResponse(ignoreSSLHttpClient: HttpClient): Document {
+            val response = ignoreSSLHttpClient.send(
+                HttpUtil.request, HttpResponse.BodyHandlers.ofString(
+                    StandardCharsets.UTF_8
+                )
+            )
+            val factory = DocumentBuilderFactory.newInstance()
+            val builder = factory.newDocumentBuilder()
+            return builder.parse(InputSource(StringReader(response.body())))
+        }
     }
 }

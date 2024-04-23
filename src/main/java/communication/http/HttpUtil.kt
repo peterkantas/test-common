@@ -1,52 +1,85 @@
-package communication.http;
+package communication.http
 
-import com.fasterxml.jackson.databind.JsonNode;
-import communication.common.CommonUtils;
-import communication.common.RequestType;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.GsonBuilder
+import communication.common.CommonUtils
+import communication.common.RequestType
+import org.w3c.dom.Document
+import org.xml.sax.SAXException
+import java.io.IOException
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import javax.xml.parsers.ParserConfigurationException
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
+class HttpUtil {
+    var cu = CommonUtils()
 
-import static communication.common.CommonUtils.makeSSLIgnoreHttpClient;
-import static communication.common.CommonUtils.returnDocumentTypeResponse;
-
-public class HttpUtil {
-    public static HttpRequest request;
-    public static HttpClient httpClient = makeSSLIgnoreHttpClient();
-    CommonUtils cu = new CommonUtils();
-
-    public static Document sendXMLRequest(String requestBody, String requestURL, String[] headers, RequestType requestType) throws IOException, InterruptedException, SAXException, ParserConfigurationException {
-        setRequestTypes(requestBody, requestURL, headers, requestType);
-        return returnDocumentTypeResponse(httpClient);
+    @kotlin.Throws(IOException::class)
+    fun sendJsonRequestPOST(
+        apiUrl: String,
+        commonRequest: String,
+        headerName: String,
+        headerValue: String,
+        requestType: RequestType
+    ): JsonNode {
+        return cu.returnJsonResponsePOST(apiUrl, commonRequest, headerName, headerValue, requestType)
     }
 
-    private static void setRequestTypes(String requestBody, String requestURL, String[] headers, RequestType requestType) {
-        switch (requestType) {
-            //TODO: Ellenőrizni kell, hogyha null a header, akkor nem száll-e el NPE-re.
-            case POST ->
-                    request = HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(headers).POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
-            case GET -> request = HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(headers).GET().build();
-            case DELETE ->
-                    request = HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(headers).DELETE().build();
+    @kotlin.Throws(IOException::class)
+    fun sendJsonRequestGET(url: String): JsonNode {
+        return cu.returnJsonResponseGET(url)
+    }
+
+    @kotlin.Throws(IOException::class)
+    fun sendJsonRequestDELETE(url: String): JsonNode {
+        return cu.returnJsonResponseDELETE(url)
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        var request: HttpRequest? = null
+        var httpClient = CommonUtils.makeSSLIgnoreHttpClient()
+
+        @kotlin.jvm.JvmStatic
+        @kotlin.Throws(
+            IOException::class,
+            InterruptedException::class,
+            SAXException::class,
+            ParserConfigurationException::class
+        )
+        fun sendXMLRequest(
+            requestBody: String,
+            requestURL: String,
+            headers: Array<String>,
+            requestType: RequestType
+        ): Document {
+            setRequestTypes(requestBody, requestURL, headers, requestType)
+            return CommonUtils.returnDocumentTypeResponse(httpClient)
         }
 
-    }
+        private fun setRequestTypes(
+            requestBody: String,
+            requestURL: String,
+            headers: Array<String>,
+            requestType: RequestType
+        ) {
+            request = when (requestType) {
+                RequestType.POST -> HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(*headers).POST(
+                    HttpRequest.BodyPublishers.ofString(requestBody)
+                ).build()
 
-    public JsonNode sendJsonRequestPOST(String apiUrl, String commonRequest, String headerName, String headerValue, RequestType requestType) throws IOException {
-        return cu.returnJsonResponsePOST(apiUrl, commonRequest, headerName, headerValue, requestType);
-    }
+                RequestType.GET -> HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(*headers).GET().build()
 
-    public JsonNode sendJsonRequestGET(String url) throws IOException {
-        return cu.returnJsonResponseGET(url);
-    }
+                RequestType.DELETE -> HttpRequest.newBuilder().uri(URI.create(requestURL)).headers(*headers).DELETE()
+                    .build()
 
-    public JsonNode sendJsonRequestDELETE(String url) throws IOException {
-        return cu.returnJsonResponseDELETE(url);
+                RequestType.PUT -> TODO()
+                RequestType.PATCH -> TODO()
+            }
+        }
     }
-
 }

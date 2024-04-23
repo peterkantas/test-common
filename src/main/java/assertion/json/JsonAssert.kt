@@ -1,52 +1,66 @@
-package assertion.json;
+package assertion.json
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode
+import org.junit.jupiter.api.Assertions
+import reading.json.ReadJsonNode
+import java.io.IOException
 
-import java.io.IOException;
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static reading.json.ReadJsonNode.readJsonResponseNode;
-
-
-public class JsonAssert {
-    public static void jsonAssertWithUrl(String url, String parent, String child, Integer childID, String keyValue, String expected) throws IOException {
-        JsonNode jsonNode = readJsonResponseNode(url);
-        if (expected == null) {
-            expected = "null";
-        }
-        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
+object JsonAssert {
+    @Throws(IOException::class)
+    fun jsonAssertWithUrl(
+        url: String,
+        parent: String,
+        child: String,
+        childID: Int,
+        keyValue: String,
+        expected: String
+    ) {
+        val jsonNode = ReadJsonNode.readJsonResponseNode(url)
+        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected)
     }
 
-    public static void jsonAssertWithFile(JsonNode jsonNode, String parent, String child, Integer childID, String keyValue, String expected) {
-        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected);
+    fun jsonAssertWithFile(
+        jsonNode: JsonNode,
+        parent: String,
+        child: String,
+        childID: Int,
+        keyValue: String,
+        expected: String
+    ) {
+        jsonAssertion(jsonNode, parent, child, childID, keyValue, expected)
     }
 
-    public static void jsonAssertion(JsonNode jsonNode, String parent, String child, Integer childID, String keyValue, String expected) {
-        String actual = null;
+    fun jsonAssertion(
+        jsonNode: JsonNode,
+        parent: String,
+        child: String,
+        childID: Int,
+        keyValue: String,
+        expected: String
+    ) {
+        lateinit var actual: String
         try {
-            if (!Objects.equals(parent, "") && Objects.equals(child, "") && Objects.equals(childID, null)
-                    && Objects.equals(keyValue, "")) {
-                actual = jsonNode.get(parent).asText();
-                assertEquals(expected, actual);
-            } else if (!Objects.equals(parent, "") && !Objects.equals(child, "")) {
-                actual = jsonNode.get(parent).get(0).get(child).get(childID).get(keyValue).asText();
-                assertEquals(expected, actual);
-            } else if (parent.equals("") && !Objects.equals(child, "") && !Objects.equals(keyValue, "")) {
-                actual = jsonNode.get(child).get(keyValue).asText();
-                assertEquals(expected, actual);
-            } else if (parent.equals("") && !Objects.equals(child, "") && keyValue.equals("")) {
-                actual = jsonNode.get(child).asText().replace("\n", "").replace("\r", "");
-                assertEquals(expected, actual);
+            if (parent != "" && child == "" && childID == null && keyValue == "") {
+                actual = jsonNode[parent].asText()
+                Assertions.assertEquals(expected, actual)
+            } else if (parent != "" && child != "") {
+                actual = jsonNode[parent][0][child][childID!!][keyValue].asText()
+                Assertions.assertEquals(expected, actual)
+            } else if (parent == "" && child != "" && keyValue != "") {
+                actual = jsonNode[child][keyValue].asText()
+                Assertions.assertEquals(expected, actual)
+            } else if (parent == "" && child != "" && keyValue == "") {
+                actual = jsonNode[child].asText().replace("\n", "").replace("\r", "")
+                Assertions.assertEquals(expected, actual)
             } else {
-                System.out.println("Something is wrong.");
+                println("Something is wrong.")
             }
-        } catch (AssertionError aE) {
-            if (keyValue.equals("")) {
-                System.out.println("Failed to check the response.:" + child + "  Difference between expected and actual value Expected value: " + expected + " Actual value: " + actual);
-                throw aE;
+        } catch (aE: AssertionError) {
+            if (keyValue == "") {
+                println("Failed to check the response.:$child  Difference between expected and actual value Expected value: $expected Actual value: $actual")
+                throw aE
             } else {
-                System.out.println("Failed to check the response.:" + keyValue + "   Difference between expected and actual value Expected value: " + expected + " Actual value: " + actual);
+                println("Failed to check the response.:$keyValue   Difference between expected and actual value Expected value: $expected Actual value: $actual")
             }
         }
     }
