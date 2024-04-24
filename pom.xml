@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hu.kantasp.common.test</groupId>
     <artifactId>systemtest-common</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -93,6 +93,11 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
