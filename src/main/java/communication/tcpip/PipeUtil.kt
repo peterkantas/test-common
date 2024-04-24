@@ -31,7 +31,7 @@ class PipeUtil {
         }
     }
 
-    protected fun finalizer() {
+    fun finalizer() {
         try {
             socket.close()
         } catch (e: IOException) {
