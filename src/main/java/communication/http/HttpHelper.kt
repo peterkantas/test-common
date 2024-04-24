@@ -3,23 +3,11 @@ package communication.http
 import com.fasterxml.jackson.databind.JsonNode
 import communication.common.CommonUtils
 import communication.common.RequestType
-import communication.http.HttpUtil.Companion.sendJsonRequest
 import communication.http.HttpUtil.Companion.sendXMLRequest
 import org.w3c.dom.Document
 
 class HttpHelper {
     var httpUtil = HttpUtil()
-    fun sendJSONPOSTRequest(requestURL: String, headers: Array<String>, requestBody: String): JsonNode {
-        println("Kérdés --------------")
-        println(requestBody)
-        println("Válasz --------------")
-        return try {
-            sendJsonRequest(requestBody, requestURL, headers, RequestType.POST)
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-    }
-
     fun sendJSONRequest(
         apiUrl: String,
         commonRequest: String,
