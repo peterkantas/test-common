@@ -5,9 +5,26 @@ import communication.common.CommonUtils
 import communication.common.RequestType
 import communication.http.HttpUtil.Companion.sendXMLRequest
 import org.w3c.dom.Document
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 class HttpHelper {
     var httpUtil = HttpUtil()
+
+    fun sendJsonRequestWithoutURLEncoding(url:String,requestString:String):String {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/json; charset=utf-8")
+            .POST(HttpRequest.BodyPublishers.ofString(requestString))
+            .build()
+
+        val client = HttpClient.newHttpClient()
+        val httpresponse = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return httpresponse.body()
+    }
+
     fun sendJSONRequest(
         apiUrl: String,
         commonRequest: String,
