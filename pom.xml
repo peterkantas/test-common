@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>hu.kantasp.common.test</groupId>
     <artifactId>systemtest-common</artifactId>
-    <version>1.1.11</version>
+    <version>1.1.12</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
